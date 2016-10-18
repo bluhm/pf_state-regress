@@ -18,7 +18,7 @@ from scapy.all import *
 class Sniff(threading.Thread):
 	captured = None
 	def run(self):
-		self.captured = sniff(iface=SRC_IF,
+		self.captured = sniff(iface=LOCAL_IF,
 		    filter='tcp src port 7', timeout=3)
 
 srcaddr=sys.argv[1]
@@ -29,19 +29,19 @@ ip=IP(src=srcaddr, dst=dstaddr)
 
 print "Send SYN packet, receive SYN+ACK"
 syn=TCP(sport=port, dport='echo', seq=1, flags='S', window=(2**16)-1)
-synack=sr1(ip/syn, iface=SRC_IF, timeout=5)
+synack=sr1(ip/syn, iface=LOCAL_IF, timeout=5)
 
 print "Send ACK packet to finish handshake."
 ack=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='A',
     ack=synack.seq+1)
-send(ip/ack, iface=SRC_IF)
+send(ip/ack, iface=LOCAL_IF)
 
 print "Connection is established, send bogus SYN, expect challenge ACK"
 bogus_syn=TCP(sport=port, dport='echo', seq=1000000, flags='S',
     window=(2**16)-1)
 sniffer = Sniff();
 sniffer.start()
-challenge_ack=send(ip/bogus_syn, iface=SRC_IF)
+challenge_ack=send(ip/bogus_syn, iface=LOCAL_IF)
 sniffer.join(timeout=5)
 
 if sniffer.captured == None:
