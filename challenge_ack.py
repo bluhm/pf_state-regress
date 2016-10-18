@@ -61,7 +61,7 @@ if challenge_ack == None:
 
 if challenge_ack.getlayer(TCP).seq != (synack.seq + 1):
 	print "ERROR: expecting seq %d got %d in challange ack" % \
-		(challenge_ack.getlayer(TCP).seq, (synack.seq + 1))
+	    (challenge_ack.getlayer(TCP).seq, (synack.seq + 1))
 	exit(1)
 
 exit(0)
