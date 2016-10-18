@@ -90,7 +90,7 @@ PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 -u ${.CURDIR}/
 TARGETS +=	challenge-ack
 run-regress-challenge-ack: stamp-pfctl
 	@echo '\n======== $@ ========'
-	${SUDO} ${PYTHON}challenge_ack.py ${SRC_OUT} ${ECO_IN}
+	${SUDO} ${PYTHON}challenge_ack.py ${FAKE_NET_ADDR} ${REMOTE_ADDR}
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
