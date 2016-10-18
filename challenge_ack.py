@@ -19,7 +19,7 @@ class Sniff(threading.Thread):
 	captured = None
 	def run(self):
 		self.captured = sniff(iface=SRC_IF,
-                    filter='tcp src port 7', timeout=3)
+		    filter='tcp src port 7', timeout=3)
 
 srcaddr=sys.argv[1]
 dstaddr=sys.argv[2]
@@ -46,7 +46,7 @@ sniffer.join(timeout=5)
 
 if sniffer.captured == None:
 	print "ERROR: no packet received"
-        exit(1)
+	exit(1)
 
 challenge_ack = None
 
@@ -57,11 +57,11 @@ for p in sniffer.captured:
 
 if challenge_ack == None:
 	print "No ACK has been seen"
-        exit(1)
+	exit(1)
 
 if challenge_ack.getlayer(TCP).seq != (synack.seq + 1):
 	print "ERROR: expecting seq %d got %d in challange ack" % \
-                (challenge_ack.getlayer(TCP).seq, (synack.seq + 1))
+		(challenge_ack.getlayer(TCP).seq, (synack.seq + 1))
 	exit(1)
 
 exit(0)
