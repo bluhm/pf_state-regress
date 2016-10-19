@@ -15,9 +15,10 @@ from scapy.all import *
 #
 class Sniff(threading.Thread):
 	captured = None
+	filter = None
 	def run(self):
-		self.captured = sniff(iface=LOCAL_IF,
-		    filter='tcp src port 7', timeout=3)
+		self.captured = sniff(iface=LOCAL_IF, filter=self.filter,
+		    timeout=3)
 
 port=os.getpid() & 0xffff
 
@@ -36,11 +37,12 @@ print "Connection is established, send bogus SYN, expect challenge ACK"
 bogus_syn=TCP(sport=port, dport='echo', seq=1000000, flags='S',
     window=(2**16)-1)
 sniffer = Sniff();
+sniffer.filter='tcp src port echo'
 sniffer.start()
-challenge_ack=send(ip/bogus_syn, iface=LOCAL_IF)
+send(ip/bogus_syn, iface=LOCAL_IF)
 sniffer.join(timeout=5)
 
-if sniffer.captured == None:
+if sniffer.captured is None:
 	print "ERROR: no packet received"
 	exit(1)
 
