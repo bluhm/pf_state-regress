@@ -6,8 +6,6 @@ import threading
 from addr import *
 from scapy.all import *
 
-# usage: challenge_ack.py src dst
-
 #
 # we can not use scapy's sr() function as receive side
 # ignores the packet we expect to see. Packet is ignored
@@ -21,11 +19,9 @@ class Sniff(threading.Thread):
 		self.captured = sniff(iface=LOCAL_IF,
 		    filter='tcp src port 7', timeout=3)
 
-srcaddr=sys.argv[1]
-dstaddr=sys.argv[2]
 port=os.getpid() & 0xffff
 
-ip=IP(src=srcaddr, dst=dstaddr)
+ip=IP(src=FAKE_NET_ADDR, dst=REMOTE_ADDR)
 
 print "Send SYN packet, receive SYN+ACK"
 syn=TCP(sport=port, dport='echo', seq=1, flags='S', window=(2**16)-1)
