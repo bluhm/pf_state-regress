@@ -51,7 +51,8 @@ if sniffer.captured == None:
 challenge_ack = None
 
 for p in sniffer.captured:
-	if p.haslayer(TCP) and p.getlayer(TCP).sport == 7:
+	if p.haslayer(TCP) and p.getlayer(TCP).sport == 7 and \
+	    p.getlayer(TCP).flags == 16:
 		challenge_ack = p
 		break
 
