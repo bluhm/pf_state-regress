@@ -89,9 +89,9 @@ run-regress-challenge-ack: stamp-pfctl
 
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
-CLEANFILES +=		addr.py *.pyc *.log *.route
+CLEANFILES +=		addr.py *.pyc *.log stamp-*
 
-.PHONY: check-setup
+.PHONY: check-setup check-setup-local check-setup-remote
 
 # Check wether the address, route and remote setup is correct
 check-setup: check-setup-local check-setup-remote
@@ -112,7 +112,7 @@ check-setup-remote:
 	ssh ${REMOTE_SSH} route -n get -inet ${REMOTE_ADDR} | grep -q 'flags: .*LOCAL'  # REMOTE_ADDR
 	ssh ${REMOTE_SSH} ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
 .for ip in FAKE_NET FAKE_NET_ADDR
-	ssh ${REMOTE_SSH} route -n get -inet ${${ip}} | fgrep -q 'gateway: ${LOCAL_OUT}'  # ${ip} LOCAL_O
+	ssh ${REMOTE_SSH} route -n get -inet ${${ip}} | fgrep -q 'gateway: ${LOCAL_ADDR}'  # ${ip} LOCAL_ADDR
 .endfor
 	ssh ${ECO_SSH} netstat -a -f inet -p tcp | fgrep ' *.echo '
 	ssh ${REMOTE_SSH} ${SUDO} pfctl -sr | grep '^anchor "regress" all$$'
