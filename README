@@ -6,6 +6,9 @@ connection to REMOTE TCP echo service.  The source address is a non
 existing address on FAKE_NET.  The LOCAL machine acts as a router
 between REMOTE and virtual FAKE_NET_ADDR and can create ICMP packets.
 
+The run-regress-challenge-ack subtest checks that the pf firewall
+sends TCP a challenge Ack if the sequence number is out of range.
+
 EXAMPLE
 
 To run this test I use the following configuration files.
