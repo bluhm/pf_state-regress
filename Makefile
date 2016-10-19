@@ -48,13 +48,11 @@ regress:
 
 .MAIN: all
 
-.if ! empty (REMOTE_SSH)
 .if make (regress) || make (all)
 .BEGIN: pf.conf addr.py
 	@echo
 	${SUDO} true
 	ssh -t ${REMOTE_SSH} ${SUDO} true
-.endif
 .endif
 
 depend: addr.py
@@ -63,13 +61,10 @@ depend: addr.py
 addr.py: Makefile
 	rm -f $@ $@.tmp
 	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
-	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
-	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
 .for var in LOCAL REMOTE FAKE_NET
 	echo '${var}_ADDR = "${${var}_ADDR}"' >>$@.tmp
 .endfor
 	echo 'FAKE_NET = "${FAKE_NET}"' >>$@.tmp
-	echo 'FAKE_NET6 = "${FAKE_NET6}"' >>$@.tmp
 	mv $@.tmp $@
 
 # load the pf rules into the kernel of the PF machine
@@ -95,5 +90,23 @@ run-regress-challenge-ack: stamp-pfctl
 REGRESS_TARGETS =	${TARGETS:S/^/run-regress-/}
 
 CLEANFILES +=		addr.py *.pyc *.log *.route
+
+.PHONY: check-setup
+
+# Check wether the address, route and remote setup is correct
+check-setup: check-setup-local check-setup-remote
+
+check-setup-local:
+	@echo '\n======== $@ ========'
+	ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+	route -n get -inet ${LOCAL_ADDR} | grep -q 'flags: .*LOCAL'  # LOCAL_ADDR
+	ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	route -n get -inet ${REMOTE_ADDR} | fgrep -q 'interface: ${LOCAL_IF}'  # REMOTE_ADDR LOCAL_IF
+	! ping -n -c 1 -w 1 ${FAKE_NET_ADDR}  # FAKE_NET_ADDR
+	route -n get -inet ${FAKE_NET_ADDR} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET_ADDR
+	route -n get -inet -net ${FAKE_NET} | grep -q 'flags: .*BLACKHOLE'  # FAKE_NET
+
+check-setup-remote:
+	@echo '\n======== $@ ========'
 
 .include <bsd.regress.mk>
