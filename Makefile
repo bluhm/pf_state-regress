@@ -67,11 +67,11 @@ addr.py: Makefile
 	echo 'FAKE_NET = "${FAKE_NET}"' >>$@.tmp
 	mv $@.tmp $@
 
-# load the pf rules into the kernel of the PF machine
+# load the pf rules into the kernel of the REMOTE machine
 stamp-pfctl: addr.py pf.conf
 	cat addr.py ${.CURDIR}/pf.conf | pfctl -n -f -
 	cat addr.py ${.CURDIR}/pf.conf | \
-	    ssh ${PF_SSH} ${SUDO} pfctl -a regress -f -
+	    ssh ${REMOTE_SSH} ${SUDO} pfctl -a regress -f -
 	@date >$@
 
 # Set variables so that make runs with and without obj directory.
@@ -108,5 +108,14 @@ check-setup-local:
 
 check-setup-remote:
 	@echo '\n======== $@ ========'
+	ssh ${REMOTE_SSH} ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} route -n get -inet ${REMOTE_ADDR} | grep -q 'flags: .*LOCAL'  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+.for ip in FAKE_NET FAKE_NET_ADDR
+	ssh ${REMOTE_SSH} route -n get -inet ${${ip}} | fgrep -q 'gateway: ${LOCAL_OUT}'  # ${ip} LOCAL_O
+.endfor
+	ssh ${ECO_SSH} netstat -a -f inet -p tcp | fgrep ' *.echo '
+	ssh ${REMOTE_SSH} ${SUDO} pfctl -sr | grep '^anchor "regress" all$$'
+	ssh ${REMOTE_SSH} ${SUDO} pfctl -si | grep '^Status: Enabled '
 
 .include <bsd.regress.mk>
