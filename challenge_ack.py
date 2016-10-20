@@ -39,8 +39,8 @@ print "Connection is established, send bogus SYN, expect challenge ACK"
 bogus_syn=TCP(sport=fake_port, dport='echo', seq=1000000, flags='S',
     window=(2**16)-1)
 sniffer = Sniff1();
-sniffer.filter="src "+REMOTE_ADDR+" and tcp port echo and dst "+FAKE_NET_ADDR+ \
-    " and tcp port "+str(fake_port)+" and tcp[tcpflags] = tcp-ack"
+sniffer.filter= "src %s and tcp port echo and dst %s and tcp port %u " \
+    "and tcp[tcpflags] = tcp-ack" % (REMOTE_ADDR, FAKE_NET_ADDR, fake_port)
 sniffer.start()
 send(ip/bogus_syn, iface=LOCAL_IF)
 sniffer.join(timeout=7)
