@@ -43,6 +43,7 @@ sniffer = Sniff1();
 sniffer.filter = "src %s and tcp port echo and dst %s and tcp port %u " \
     "and tcp[tcpflags] = tcp-ack" % (REMOTE_ADDR, FAKE_NET_ADDR, fake_port)
 sniffer.start()
+time.sleep(1)
 send(ip/bogus_syn, iface=LOCAL_IF)
 sniffer.join(timeout=7)
 challenge_ack = sniffer.packet
