@@ -20,7 +20,8 @@ class Sniff1(threading.Thread):
 	def run(self):
 		self.captured = sniff(iface=LOCAL_IF, filter=self.filter,
 		    count=1, timeout=5)
-		self.packet = self.captured[0]
+		if self.captured:
+			self.packet = self.captured[0]
 
 fake_port=os.getpid() & 0xffff
 
