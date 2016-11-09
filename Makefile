@@ -1,4 +1,4 @@
-#	$OpenBSD: Makefile,v 1.2 2016/10/20 16:31:37 bluhm Exp $
+#	$OpenBSD: Makefile,v 1.3 2016/11/09 12:43:36 bluhm Exp $
 
 # The following ports must be installed:
 #
