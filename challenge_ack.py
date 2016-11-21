@@ -31,6 +31,10 @@ print "Send SYN packet, receive SYN+ACK"
 syn=TCP(sport=fake_port, dport='echo', seq=1, flags='S', window=(2**16)-1)
 synack=sr1(ip/syn, iface=LOCAL_IF, timeout=5)
 
+if synack is None:
+	print "ERROR: no matching SYN+ACK packet received"
+	exit(1)
+
 print "Send ACK packet to finish handshake."
 ack=TCP(sport=synack.dport, dport=synack.sport, seq=2, flags='A',
     ack=synack.seq+1)
