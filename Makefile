@@ -23,7 +23,9 @@ regress:
 	@echo '${PYTHON_IMPORT}'
 	@echo Install python and the scapy module for additional tests.
 	@echo SKIPPED
-.elif ! empty(PF_ENABLED) && empty(PF_ANCHOR)
+.endif
+
+.if ! empty(PF_ENABLED) && empty(PF_ANCHOR)
 .BEGIN:
 	@true
 regress:
